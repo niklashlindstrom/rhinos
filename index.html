@@ -22,7 +22,6 @@ body {
   max-width: 520px;
   background: var(--rhinos-white);
   margin: 2em auto;
-  width: 100%;
   border-radius: 18px;
   box-shadow: 0 8px 36px 0 rgba(30,30,30,0.09);
   padding: 2em 2em 1.5em 2em;
@@ -223,17 +222,22 @@ td {
 }
 
 @media (max-width: 700px) {
-  body {
+  html, body {
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+    min-width: 0;
     background: var(--rhinos-gray);
   }
   .container {
-    max-width: 100vw;
-    margin: 0;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    box-shadow: none;
-    padding: 0.7em 0.2em 1.1em 0.2em;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    box-shadow: none !important;
+    padding: 0.7em 0 1.1em 0 !important;
   }
   .logo-box {
     flex-direction: column;
@@ -301,7 +305,7 @@ td {
   <div class="container">
     <div class="logo-box">
       <img src="https://borasrhinos.web.sportadmin.se/im/hemsidaLogga/939/22639/_genLogga.png?v=19" alt="Borås Rhinos Logo">
-      <h1>Borås Rhinos<br>Klubbkläder, v1</h1>
+      <h1>Borås Rhinos<br>Klubbkläder, v2</h1>
     </div>
     <form id="orderForm" autocomplete="off">
       <label>Namn:
