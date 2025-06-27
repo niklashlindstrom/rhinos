@@ -5,7 +5,7 @@
   <title>Borås Rhinos - Klubbkläder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-<style>
+  <style>
 :root {
   --rhinos-red: #b40019;
   --rhinos-black: #1a1a1a;
@@ -52,8 +52,8 @@ body {
   width: 100%;
   max-width: 540px;
   margin: 0 auto;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
+  padding-left: 10px;
+  padding-right: 10px;
   box-sizing: border-box;
   margin-bottom: 3em;
 }
@@ -136,7 +136,6 @@ h2 {
 .remove-btn:hover { background: var(--rhinos-red); }
 
 .cart-bar {
-  display: none;
   position: fixed;
   left: 0; right: 0; bottom: 0;
   z-index: 1000;
@@ -148,7 +147,7 @@ h2 {
   min-height: 52px;
   box-shadow: 0 -2px 14px #0003;
   padding: 0 18px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -262,15 +261,8 @@ h2 {
 }
 .cart-item-actions {
   display: flex;
-  flex-direction: column;
-  gap: 0.3em;
-  margin-top: 0.4em;
-  align-items: flex-end;
-}
-.cart-item-actions input[type="number"] {
-  width: 56px;
-  margin-bottom: 0.2em;
-  padding: 0.38em 0.6em;
+  gap: 0.6em;
+  margin-top: 0.3em;
 }
 .cart-item-remove {
   background: var(--rhinos-red);
@@ -335,51 +327,55 @@ h2 {
   box-shadow: 0 2px 0 #3332;
   cursor: pointer;
   transition: background 0.2s;
-  position: relative;
 }
-.cart-modal-submit[disabled] {
-  opacity: 0.6;
-  pointer-events: none;
-}
-.cart-modal-spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid var(--rhinos-red);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  animation: spin 1s linear infinite;
-  margin: 1.3em auto 1.5em auto;
-  display: block;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
+.cart-modal-submit:hover {
+  background: var(--rhinos-red);
 }
 .toast {
   position: fixed;
-  top: 20px;
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--rhinos-red);
-  color: #fff;
-  font-size: 1.15em;
-  padding: 1em 2em;
-  border-radius: 12px;
+  min-width: 180px;
+  max-width: 85vw;
   z-index: 4000;
-  box-shadow: 0 2px 16px #0003;
+  padding: 1.1em 1.4em;
+  border-radius: 10px;
+  text-align: center;
   font-weight: 700;
+  color: #fff;
+  font-size: 1.11em;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s;
+  transition: opacity 0.35s, top 0.32s;
+  display: none;
 }
-.toast.show {
-  opacity: 1;
-  pointer-events: auto;
+.toast.show { opacity: 1; pointer-events: auto; top: 40px;}
+.toast.success { background: #1dbb4b; }
+.toast.error { background: var(--rhinos-red);}
+@media (max-width: 1000px) {
+  .header-bar,
+  .form-area {
+    max-width: 100vw;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 0;
+  }
+  .header-bar {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .product-row-outer {
+    border-radius: 0;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-bottom: 1.1em;
+  }
 }
 @media (max-width: 500px) {
   .form-area, .header-bar {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+    padding-left: 0;
+    padding-right: 0;
   }
   .cart-modal,
   .header-bar,
@@ -394,12 +390,12 @@ h2 {
     padding-right: 0;
   }
 }
-</style>
+  </style>
 </head>
 <body>
   <div class="header-bar">
     <img src="https://borasrhinos.web.sportadmin.se/im/hemsidaLogga/939/22639/_genLogga.png?v=19" class="logo" alt="Borås Rhinos Logo">
-    <h1>Borås Rhinos<br>Beställ klubbkläder</h1>
+    <h1>Borås Rhinos<br>Klubbkläder</h1>
   </div>
   <div class="form-area">
     <form id="orderForm" autocomplete="off">
@@ -407,12 +403,14 @@ h2 {
       <div class="product-list" id="product-list"></div>
     </form>
   </div>
+  <!-- Cart bar -->
   <div class="cart-bar" id="cart-bar" style="display:none;">
     <span class="cart-badge" id="cart-badge">0</span>
     <span id="cart-label">Din beställning</span>
     <span class="cart-total" id="cart-total"></span>
     <span class="cart-arrow">▲</span>
   </div>
+  <!-- Slide-up cart modal -->
   <div class="cart-modal-backdrop" id="cart-modal-backdrop">
     <div class="cart-modal" id="cart-modal">
       <div class="cart-modal-header">
@@ -427,321 +425,303 @@ h2 {
         </div>
         <form class="cart-modal-form" id="cart-modal-form" autocomplete="off" onsubmit="return false;">
           <label>Namn:
-            <input type="text" id="cart-name" required autocomplete="name">
+            <input type="text" id="cart-name" required autocomplete="off">
           </label>
           <label>Email:
-            <input type="email" id="cart-email" required autocomplete="email">
+            <input type="email" id="cart-email" required autocomplete="off">
           </label>
-          <button type="button" class="cart-modal-submit" id="cart-modal-submit">
-            Skicka Order
-          </button>
+          <button type="button" class="cart-modal-submit" id="cart-modal-submit">Skicka Order</button>
           <div id="cart-modal-result" style="text-align:center;margin-top:1em;"></div>
         </form>
       </div>
     </div>
   </div>
-  <div class="toast" id="thankyou-toast" style="display:none;"></div>
-<script>
-const products = [
-  {
-    name: "Hoodie med dragkedja",
-    desc: "Svart med Rhinos-tryck stort på ryggen, litet på bröstet",
-    priceInfo: "Barn: 250 kr, Vuxen: 350 kr",
-    key: "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)",
-    sizePrices: {
-      "90": 250, "100": 250, "110": 250, "120": 250, "130": 250, "140": 250, "150": 250, "160": 250,
-      "XS": 350, "S": 350, "M": 350, "L": 350, "XL": 350, "XXL": 350, "XXXL": 350
-    },
-    sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"]
-  },
-  {
-    name: "Träningsshorts",
-    desc: "Svarta med Rhinos-tryck på benet",
-    priceInfo: "Barn: 150 kr, Vuxen: 200 kr",
-    key: "Träningsshorts (Rhinos-tryck på benet)",
-    sizePrices: {
-      "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150, "160": 150,
-      "S": 200, "M": 200, "L": 200, "XL": 200, "XXL": 200
-    },
-    sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"]
-  },
-  {
-    name: "Sweat pants",
-    desc: "Svarta med Rhinos-tryck på benet",
-    priceInfo: "Barn: 150 kr, Vuxen: 250 kr",
-    key: "Sweat pants (Rhinos-tryck på benet)",
-    sizePrices: {
-      "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150,
-      "S": 250, "M": 250, "L": 250, "XL": 250, "XXL": 250
-    },
-    sizes: ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
-  },
-  {
-    name: "Keps med Rhinos-tryck",
-    desc: "",
-    priceInfo: "Pris: 150 kr",
-    key: "Keps med Rhinos-tryck",
-    sizePrices: { "": 150 },
-    sizes: [""]
-  }
-];
-let orders = [];
+  <div class="toast" id="thankyou-toast"></div>
+  <script>
+    const products = [
+      {
+        name: "Hoodie med dragkedja",
+        desc: "Svart med Rhinos-tryck stort på ryggen, litet på bröstet",
+        priceInfo: "Barn: 250 kr, Vuxen: 350 kr",
+        key: "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)",
+        sizePrices: {
+          "90": 250, "100": 250, "110": 250, "120": 250, "130": 250, "140": 250, "150": 250, "160": 250,
+          "XS": 350, "S": 350, "M": 350, "L": 350, "XL": 350, "XXL": 350, "XXXL": 350
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"]
+      },
+      {
+        name: "Träningsshorts",
+        desc: "Svarta med Rhinos-tryck på benet",
+        priceInfo: "Barn: 150 kr, Vuxen: 200 kr",
+        key: "Träningsshorts (Rhinos-tryck på benet)",
+        sizePrices: {
+          "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150, "160": 150,
+          "S": 200, "M": 200, "L": 200, "XL": 200, "XXL": 200
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"]
+      },
+      {
+        name: "Sweat pants",
+        desc: "Svarta med Rhinos-tryck på benet",
+        priceInfo: "Barn: 150 kr, Vuxen: 250 kr",
+        key: "Sweat pants (Rhinos-tryck på benet)",
+        sizePrices: {
+          "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150,
+          "S": 250, "M": 250, "L": 250, "XL": 250, "XXL": 250
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
+      },
+      {
+        name: "Keps med Rhinos-tryck",
+        desc: "",
+        priceInfo: "Pris: 150 kr",
+        key: "Keps med Rhinos-tryck",
+        sizePrices: { "": 150 },
+        sizes: [""]
+      }
+    ];
+    let orders = [];
 
-// Product cards
-function renderProductList() {
-  const list = document.getElementById("product-list");
-  list.innerHTML = "";
-  products.forEach((p, idx) => {
-    const card = document.createElement("div");
-    card.className = "product-row-outer";
-    const sizeId = `size-${idx}`;
-    const qtyId = `qty-${idx}`;
-    card.innerHTML = `
-      <div class="product-header">${p.name}</div>
-      ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ""}
-      <div class="product-priceinfo">${p.priceInfo}</div>
-      <div class="product-row">
-        ${p.sizes.length > 1
-          ? `<select id="${sizeId}">
-               <option value="">Välj storlek</option>
-               ${p.sizes.map(s => `<option value="${s}">${s} (${p.sizePrices[s]} kr)</option>`).join("")}
-             </select>`
-          : ""}
-        <input type="number" min="1" value="1" id="${qtyId}" style="width:70px;">
-        <button type="button" class="add-btn" onclick="addOrder(${idx})">Lägg till</button>
-      </div>
-    `;
-    list.appendChild(card);
-  });
-}
-renderProductList();
+    function isMobile() {
+      return window.matchMedia('(max-width: 1000px)').matches;
+    }
 
-function addOrder(idx) {
-  const p = products[idx];
-  const size = p.sizes.length > 1 ? document.getElementById(`size-${idx}`).value : "";
-  const qty = Math.max(1, parseInt(document.getElementById(`qty-${idx}`).value) || 1);
-  if (p.sizes.length > 1 && (!size || p.sizePrices[size] == null)) {
-    alert("Välj storlek.");
-    return;
-  }
-  const price = p.sizePrices[size] || 0;
-  if (orders.find(o => o.item === p.key && o.size === size)) {
-    alert("Redan tillagd med denna storlek, ändra antal eller ta bort i beställningen.");
-    return;
-  }
-  orders.push({ item: p.key, size, quantity: qty, price });
-  renderCartBar();
-  renderCartModal();
-}
-window.addOrder = addOrder;
-
-// ----------- CART BAR + MODAL ------------
-function renderCartBar() {
-  const bar = document.getElementById('cart-bar');
-  const badge = document.getElementById('cart-badge');
-  const totalEl = document.getElementById('cart-total');
-  if (orders.length > 0) {
-    let totalItems = orders.reduce((s, o) => s + o.quantity, 0);
-    let totalKr = orders.reduce((s, o) => s + o.price * o.quantity, 0);
-    badge.textContent = totalItems;
-    totalEl.textContent = `${totalKr} kr`;
-    bar.style.display = "flex";
-  } else {
-    badge.textContent = '0';
-    totalEl.textContent = '';
-    bar.style.display = "none";
-  }
-}
-
-function renderCartModal() {
-  const list = document.getElementById('cart-items-list');
-  const totalEl = document.getElementById('cart-modal-total');
-  list.innerHTML = "";
-  let totalItems = 0, totalKr = 0;
-  orders.forEach((o, idx) => {
-    totalItems += o.quantity;
-    totalKr += o.quantity * o.price;
-    const li = document.createElement("li");
-    li.className = "cart-item-card";
-    li.innerHTML = `
-      <div class="cart-item-row">
-        <div class="cart-item-main">${o.item}</div>
-        <div class="cart-item-details">${o.size ? "Storlek: " + o.size + " &nbsp; " : ""}${o.price} kr x ${o.quantity}</div>
-      </div>
-      <div class="cart-item-actions">
-        <input type="number" min="1" value="${o.quantity}" data-idx="${idx}" class="cart-qty-input" style="width:56px;" onfocus="this.select()">
-        <button class="cart-item-remove" onclick="removeOrder(${idx})">Ta bort</button>
-      </div>
-    `;
-    list.appendChild(li);
-  });
-  totalEl.textContent = `Totalt: ${totalKr} kr`;
-  document.getElementById("cart-modal-submit").style.display = orders.length ? "" : "none";
-  document.getElementById("cart-modal-form").style.display = orders.length ? "" : "none";
-
-  // Set up input listeners **after** DOM is updated
-  setTimeout(() => {
-    document.querySelectorAll('.cart-qty-input').forEach(input => {
-      input.addEventListener('input', function(e) {
-        const idx = parseInt(this.getAttribute('data-idx'));
-        let val = Math.max(1, parseInt(this.value) || 1);
-        this.value = val; // Keep it in the input
-        orders[idx].quantity = val;
-        renderCartBar();
-        renderCartModal();
-        // Restore focus
-        const allInputs = document.querySelectorAll('.cart-qty-input');
-        if (allInputs[idx]) {
-          allInputs[idx].focus();
-          allInputs[idx].setSelectionRange(allInputs[idx].value.length, allInputs[idx].value.length);
-        }
+    function renderProductList() {
+      const list = document.getElementById("product-list");
+      list.innerHTML = "";
+      products.forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "product-row-outer";
+        const sizeId = `size-${idx}`;
+        const qtyId = `qty-${idx}`;
+        card.innerHTML = `
+          <div class="product-header">${p.name}</div>
+          ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ""}
+          <div class="product-priceinfo">${p.priceInfo}</div>
+          <div class="product-row">
+            ${p.sizes.length > 1
+              ? `<select id="${sizeId}">
+                   <option value="">Välj storlek</option>
+                   ${p.sizes.map(s => `<option value="${s}">${s} (${p.sizePrices[s]} kr)</option>`).join("")}
+                 </select>`
+              : ""}
+            <input type="number" min="1" value="1" id="${qtyId}" style="width:70px;">
+            <button type="button" class="add-btn" onclick="addOrder(${idx})">Lägg till</button>
+          </div>
+        `;
+        list.appendChild(card);
       });
-      // Prevent modal close on mobile
-      input.addEventListener('touchstart', function(e){ e.stopPropagation(); });
-      input.addEventListener('mousedown', function(e){ e.stopPropagation(); });
-      input.addEventListener('focus', function(e){ e.stopPropagation(); });
-    });
-  }, 10);
-}
+    }
+    renderProductList();
 
-function removeOrder(idx) {
-  orders.splice(idx, 1);
-  renderCartBar();
-  renderCartModal();
-}
-window.removeOrder = removeOrder;
-
-function openCartModal() {
-  if (!orders.length) return;
-  document.getElementById('cart-modal-backdrop').style.display = "flex";
-  setTimeout(() => {
-    document.getElementById('cart-modal').classList.add('open');
-  }, 10);
-  renderCartModal();
-  document.getElementById('cart-name').value = localStorage.getItem('cartName') || '';
-  document.getElementById('cart-email').value = localStorage.getItem('cartEmail') || '';
-  document.getElementById('cart-modal-result').textContent = '';
-  document.getElementById('cart-modal-submit').style.display = orders.length ? "" : "none";
-}
-function closeCartModal() {
-  document.getElementById('cart-modal').classList.remove('open');
-  setTimeout(() => {
-    document.getElementById('cart-modal-backdrop').style.display = "none";
-    // Clear name/email fields
-    document.getElementById('cart-name').value = '';
-    document.getElementById('cart-email').value = '';
-  }, 310);
-}
-document.getElementById('cart-bar').onclick = openCartModal;
-document.getElementById('cart-modal-close').onclick = closeCartModal;
-document.getElementById('cart-modal-backdrop').onclick = function(e) {
-  if (e.target === this) closeCartModal();
-};
-
-// ----------- FORM SUBMIT ------------
-function showToast(msg) {
-  const toast = document.getElementById('thankyou-toast');
-  toast.textContent = msg;
-  toast.style.display = 'block';
-  setTimeout(() => { toast.classList.add('show'); }, 10);
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => { toast.style.display = 'none'; }, 310);
-  }, 4000);
-}
-function submitOrder(name, email, cb) {
-  if (!orders.length) {
-    alert("Lägg till minst en produkt.");
-    return;
-  }
-  let sent = 0, failed = 0;
-  orders.forEach((order, i) => {
-    fetch("https://script.google.com/macros/s/AKfycbzV_Li1OuPfBPgjAaYehzbaWpebXpxdbY6o0dtjwxIcXnp4bXmLw5mi7AUSP9R_Nf74ow/exec", {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        email,
-        item: order.item,
-        size: order.size,
-        quantity: order.quantity,
-        price: order.price
-      })
-    })
-    .then(() => {
-      sent++;
-      if (sent + failed === orders.length) {
-        cb(true, name);
+    function addOrder(idx) {
+      const p = products[idx];
+      const size = p.sizes.length > 1 ? document.getElementById(`size-${idx}`).value : "";
+      const qty = Math.max(1, parseInt(document.getElementById(`qty-${idx}`).value) || 1);
+      if (p.sizes.length > 1 && (!size || p.sizePrices[size] == null)) {
+        alert("Välj storlek.");
+        return;
       }
-    })
-    .catch(() => {
-      failed++;
-      if (sent + failed === orders.length) {
-        cb(false);
+      const price = p.sizePrices[size] || 0;
+      if (orders.find(o => o.item === p.key && o.size === size)) {
+        alert("Redan tillagd med denna storlek, ändra antal eller ta bort i beställningen.");
+        return;
       }
-    });
-  });
-}
-
-document.getElementById('cart-modal-submit').onclick = function() {
-  const name = document.getElementById('cart-name').value.trim();
-  const email = document.getElementById('cart-email').value.trim();
-  const errorDiv = document.getElementById('cart-modal-result');
-  if (!name) {
-    errorDiv.textContent = "Fyll i ditt namn!";
-    document.getElementById('cart-name').focus();
-    return;
-  }
-  if (!email) {
-    errorDiv.textContent = "Fyll i din e-post!";
-    document.getElementById('cart-email').focus();
-    return;
-  }
-  errorDiv.innerHTML = '<span class="cart-modal-spinner"></span>';
-  document.getElementById('cart-modal-submit').setAttribute('disabled', 'disabled');
-  // Save name/email for next time (in browser)
-  localStorage.setItem('cartName', name);
-  localStorage.setItem('cartEmail', email);
-  submitOrder(name, email, function(success, name) {
-    if (success) {
-      orders = [];
+      orders.push({ item: p.key, size, quantity: qty, price });
       renderCartBar();
       renderCartModal();
-      products.forEach((p, idx) => {
-        const qty = document.getElementById(`qty-${idx}`);
-        if (qty) qty.value = "1";
-        const size = document.getElementById(`size-${idx}`);
-        if (size) size.selectedIndex = 0;
-      });
-      errorDiv.innerHTML = "";
-      document.getElementById("cart-modal-submit").style.display = "none";
-      document.getElementById("cart-items-list").innerHTML = "";
-      document.getElementById("cart-modal-total").textContent = "";
-      document.getElementById("cart-modal-form").style.display = "none";
-      closeCartModal();
-      showToast(`Order skickad! Tack, ${name}.`);
-      setTimeout(() => {
-        document.getElementById('cart-modal-submit').removeAttribute('disabled');
-        document.getElementById("cart-modal-form").style.display = "";
-        errorDiv.textContent = "";
-      }, 4100);
-    } else {
-      errorDiv.innerHTML = `<p><b>Något gick fel.</b> Försök igen.</p>`;
-      document.getElementById('cart-modal-submit').removeAttribute('disabled');
     }
-  });
-};
+    window.addOrder = addOrder;
 
-document.getElementById("orderForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-});
-renderCartBar();
-renderCartModal();
-window.addEventListener('resize', function() {
-  renderCartBar();
-  renderCartModal();
-});
-</script>
+    function renderCartBar() {
+      const bar = document.getElementById('cart-bar');
+      const badge = document.getElementById('cart-badge');
+      const totalEl = document.getElementById('cart-total');
+      if (orders.length > 0) {
+        let totalItems = orders.reduce((s, o) => s + o.quantity, 0);
+        let totalKr = orders.reduce((s, o) => s + o.price * o.quantity, 0);
+        badge.textContent = totalItems;
+        totalEl.textContent = `${totalKr} kr`;
+        bar.style.display = "flex";
+      } else {
+        bar.style.display = "none";
+      }
+    }
+
+    // Only re-render bar/modal, never focus or keyboard
+    function renderCartModal() {
+      const list = document.getElementById('cart-items-list');
+      const totalEl = document.getElementById('cart-modal-total');
+      list.innerHTML = "";
+      let totalItems = 0, totalKr = 0;
+      orders.forEach((o, idx) => {
+        totalItems += o.quantity;
+        totalKr += o.quantity * o.price;
+        const li = document.createElement("li");
+        li.className = "cart-item-card";
+        li.innerHTML = `
+          <div class="cart-item-row">
+            <div class="cart-item-main">${o.item}</div>
+            <div class="cart-item-details">${o.size ? "Storlek: " + o.size + " &nbsp; " : ""}${o.price} kr x <span id="cart-qty-view-${idx}">${o.quantity}</span></div>
+          </div>
+          <div class="cart-item-actions">
+            <input type="number" min="1" value="${o.quantity}" data-idx="${idx}" class="cart-qty-input" style="width:56px;">
+            <button class="cart-item-remove" onclick="removeOrder(${idx})">Ta bort</button>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+      totalEl.textContent = `Totalt: ${totalKr} kr`;
+      document.getElementById("cart-modal-submit").style.display = orders.length ? "" : "none";
+      document.getElementById("cart-modal-form").style.display = orders.length ? "" : "none";
+
+      // Attach input event after DOM creation (to avoid rerendering modal)
+      document.querySelectorAll('.cart-qty-input').forEach(input => {
+        input.onchange = function() {
+          const idx = parseInt(input.getAttribute('data-idx'));
+          let val = Math.max(1, parseInt(input.value) || 1);
+          orders[idx].quantity = val;
+          document.getElementById(`cart-qty-view-${idx}`).textContent = val;
+          renderCartBar(); // only update bar
+        };
+      });
+    }
+
+    function removeOrder(idx) {
+      orders.splice(idx, 1);
+      renderCartBar();
+      renderCartModal();
+    }
+    window.removeOrder = removeOrder;
+
+    // ----------- CART MODAL LOGIC ------------
+    function openCartModal() {
+      if (!orders.length) return;
+      document.getElementById('cart-modal-backdrop').style.display = "flex";
+      setTimeout(() => {
+        document.getElementById('cart-modal').classList.add('open');
+      }, 10);
+      renderCartModal();
+      // Clear name/email every open
+      document.getElementById('cart-name').value = "";
+      document.getElementById('cart-email').value = "";
+      document.getElementById('cart-modal-result').textContent = '';
+      document.getElementById('cart-modal-submit').style.display = orders.length ? "" : "none";
+      document.getElementById('cart-modal-form').style.display = orders.length ? "" : "none";
+    }
+    function closeCartModal() {
+      document.getElementById('cart-modal').classList.remove('open');
+      setTimeout(() => {
+        document.getElementById('cart-modal-backdrop').style.display = "none";
+      }, 310);
+      // Also clear name/email when closing
+      document.getElementById('cart-name').value = "";
+      document.getElementById('cart-email').value = "";
+    }
+    document.getElementById('cart-bar').onclick = openCartModal;
+    document.getElementById('cart-modal-close').onclick = closeCartModal;
+    document.getElementById('cart-modal-backdrop').onclick = function(e) {
+      if (e.target === this) closeCartModal();
+    };
+
+    // ----------- ORDER SUBMIT ------------
+    function showToast(msg, type) {
+      const toast = document.getElementById('thankyou-toast');
+      toast.textContent = msg;
+      toast.className = 'toast ' + (type === 'success' ? 'success' : 'error');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.classList.add('show'); }, 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { toast.style.display = 'none'; }, 310);
+      }, 4000);
+    }
+
+    function submitOrder(name, email, cb) {
+      if (!orders.length) {
+        cb(false);
+        return;
+      }
+      let sent = 0, failed = 0;
+      orders.forEach((order, i) => {
+        fetch("https://script.google.com/macros/s/AKfycbzV_Li1OuPfBPgjAaYehzbaWpebXpxdbY6o0dtjwxIcXnp4bXmLw5mi7AUSP9R_Nf74ow/exec", {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            item: order.item,
+            size: order.size,
+            quantity: order.quantity,
+            price: order.price
+          })
+        })
+        .then(() => {
+          sent++;
+          if (sent + failed === orders.length) {
+            cb(true, name);
+          }
+        })
+        .catch(() => {
+          failed++;
+          if (sent + failed === orders.length) {
+            cb(false);
+          }
+        });
+      });
+    }
+
+    document.getElementById('cart-modal-submit').onclick = function() {
+      const name = document.getElementById('cart-name').value.trim();
+      const email = document.getElementById('cart-email').value.trim();
+      const errorDiv = document.getElementById('cart-modal-result');
+      if (!name) {
+        errorDiv.textContent = "Fyll i ditt namn!";
+        document.getElementById('cart-name').focus();
+        return;
+      }
+      if (!email) {
+        errorDiv.textContent = "Fyll i din e-post!";
+        document.getElementById('cart-email').focus();
+        return;
+      }
+      errorDiv.textContent = "";
+      document.getElementById('cart-modal-submit').disabled = true;
+      document.getElementById('cart-modal-submit').textContent = "Skickar...";
+      submitOrder(name, email, function(success, name) {
+        document.getElementById('cart-modal-submit').disabled = false;
+        document.getElementById('cart-modal-submit').textContent = "Skicka Order";
+        if (success) {
+          orders = [];
+          renderCartBar();
+          renderCartModal();
+          products.forEach((p, idx) => {
+            const qty = document.getElementById(`qty-${idx}`);
+            if (qty) qty.value = "1";
+            const size = document.getElementById(`size-${idx}`);
+            if (size) size.selectedIndex = 0;
+          });
+          closeCartModal();
+          showToast("Order skickad! Tack, " + name + ".", "success");
+        } else {
+          showToast("Något gick fel. Försök igen.", "error");
+        }
+      });
+    };
+
+    // Prevent desktop form submit
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+    });
+
+    renderCartBar();
+    renderCartModal();
+    window.addEventListener('resize', function() {
+      renderCartBar();
+      renderCartModal();
+    });
+  </script>
 </body>
 </html>
