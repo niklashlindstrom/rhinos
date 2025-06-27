@@ -142,21 +142,6 @@ h2 {
   padding: 0.45em 1.15em;
   border-radius: 7px;
 }
-.submit-btn {
-  font-size: 1.05em;
-  padding: 1em 1em;
-  border-radius: 8px;
-  background: var(--rhinos-black);
-  color: var(--rhinos-white);
-  border: none;
-  width: 100%;
-  margin-top: 1.4em;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 1.5px 0 #33333320;
-  transition: background 0.2s;
-}
-.submit-btn:hover { background: var(--rhinos-red); }
 .add-btn {
   background: var(--rhinos-red);
   color: var(--rhinos-white);
@@ -173,16 +158,29 @@ h2 {
   margin-left: 0.2em;
 }
 .remove-btn:hover { background: var(--rhinos-red); }
-#result {
-  background: #fff9f9;
-  color: var(--rhinos-black);
-  padding: 1.1em 1.3em;
-  border-radius: 12px;
-  margin-top: 2em;
-  border: 1.6px solid var(--rhinos-red);
-  font-size: 1.16em;
-  min-height: 2.5em;
-  text-align: center;
+#order-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1.2em;
+  margin-top: 0.7em;
+  background: var(--rhinos-white);
+  border-radius: 8px;
+  overflow: hidden;
+}
+th, td {
+  border: 1px solid #e1e1e1;
+  padding: 0.8em 0.5em;
+  text-align: left;
+}
+th {
+  background: #faf9f9;
+  color: var(--rhinos-red);
+  font-weight: 700;
+  font-size: 1.02em;
+  border-bottom: 2.3px solid var(--rhinos-red);
+}
+td {
+  font-size: 1em;
 }
 .order-total {
   text-align: right;
@@ -232,7 +230,6 @@ h2 {
   font-size: 1.15em;
   font-weight: 700;
 }
-
 .cart-modal-backdrop {
   display: none;
   position: fixed;
@@ -242,7 +239,6 @@ h2 {
   justify-content: flex-end;
   align-items: flex-end;
 }
-
 .cart-modal {
   background: #fff;
   border-radius: 15px 15px 0 0;
@@ -261,11 +257,9 @@ h2 {
   flex-direction: column;
   overflow: auto;
 }
-
 .cart-modal.open {
   transform: translateX(-50%) translateY(0%);
 }
-
 .cart-modal-header {
   display: flex;
   align-items: center;
@@ -276,7 +270,6 @@ h2 {
   font-weight: 700;
   justify-content: space-between;
 }
-
 .cart-modal-close {
   background: none;
   border: none;
@@ -286,7 +279,6 @@ h2 {
   cursor: pointer;
   font-weight: 700;
 }
-
 .cart-modal-content {
   padding: 0.8em 1.3em 0.7em 1.3em;
   flex: 1 1 auto;
@@ -362,7 +354,6 @@ h2 {
 .cart-modal-submit:hover {
   background: var(--rhinos-red);
 }
-
 @media (max-width: 1000px) {
   .header-bar,
   .form-area {
@@ -448,9 +439,7 @@ h2 {
         <tbody></tbody>
       </table>
       <div id="order-total" class="order-total" style="display:none;"></div>
-      <button type="submit" class="submit-btn" id="desktop-order-btn">Skicka Order</button>
     </form>
-    <div id="result"></div>
   </div>
   <!-- Cart bar for mobile -->
   <div class="cart-bar" id="cart-bar" style="display:none;">
@@ -521,12 +510,10 @@ h2 {
     ];
     let orders = [];
 
-    // Detect if we're on mobile (less than 1000px)
     function isMobile() {
       return window.matchMedia('(max-width: 1000px)').matches;
     }
 
-    // Render product cards
     function renderProductList() {
       const list = document.getElementById("product-list");
       list.innerHTML = "";
@@ -555,7 +542,6 @@ h2 {
     }
     renderProductList();
 
-    // Add order from card
     function addOrder(idx) {
       const p = products[idx];
       const size = p.sizes.length > 1 ? document.getElementById(`size-${idx}`).value : "";
@@ -565,7 +551,6 @@ h2 {
         return;
       }
       const price = p.sizePrices[size] || 0;
-      // Prevent duplicates: product+size combo
       if (orders.find(o => o.item === p.key && o.size === size)) {
         alert("Redan tillagd med denna storlek, ändra antal eller ta bort i beställningen.");
         return;
@@ -577,7 +562,6 @@ h2 {
     }
     window.addOrder = addOrder;
 
-    // Table for desktop
     function renderOrderTable() {
       const table = document.getElementById("order-table");
       const tbody = table.querySelector("tbody");
@@ -605,8 +589,6 @@ h2 {
       } else {
         orderTotal.style.display = "none";
       }
-      // Hide desktop order button if no items
-      document.getElementById("desktop-order-btn").style.display = orders.length ? "" : "none";
     }
     function updateQty(idx, value) {
       orders[idx].quantity = Math.max(1, parseInt(value) || 1);
@@ -644,7 +626,6 @@ h2 {
     }
 
     function renderCartModal() {
-      // Only update if cart modal is open or if something changed
       const modal = document.getElementById('cart-modal');
       const list = document.getElementById('cart-items-list');
       const totalEl = document.getElementById('cart-modal-total');
@@ -668,11 +649,9 @@ h2 {
         list.appendChild(li);
       });
       totalEl.textContent = `Totalt: ${totalKr} kr`;
-      // Hide order button if cart is empty
       document.getElementById("cart-modal-submit").style.display = orders.length ? "" : "none";
     }
 
-    // Open/close cart modal on mobile
     function openCartModal() {
       if (!orders.length) return;
       document.getElementById('cart-modal-backdrop').style.display = "flex";
@@ -693,8 +672,8 @@ h2 {
       if (e.target === this) closeCartModal();
     };
 
-    // ----------- FORM SUBMIT (works for both desktop and mobile) ------------
-    function submitOrder(name, email, cb, isCartModal) {
+    // ----------- FORM SUBMIT ------------
+    function submitOrder(name, email, cb) {
       if (!orders.length) {
         alert("Lägg till minst en produkt.");
         return;
@@ -730,42 +709,11 @@ h2 {
     }
 
     document.getElementById("orderForm").addEventListener("submit", function(e) {
-      if (isMobile()) {
-        e.preventDefault();
-        return false;
-      }
       e.preventDefault();
-      const name = this.name.value;
-      const email = this.email.value;
-      if (!orders.length) {
-        alert("Lägg till minst en produkt.");
-        return;
-      }
-      submitOrder(name, email, function(success, name) {
-        if (success) {
-          document.getElementById("result").innerHTML =
-            `<p><b>Order skickad!</b> Tack, ${name}.</p>`;
-          orders = [];
-          renderOrderTable();
-          renderCartBar();
-          renderCartModal();
-          document.getElementById("orderForm").reset();
-          // Reset inputs
-          products.forEach((p, idx) => {
-            const qty = document.getElementById(`qty-${idx}`);
-            if (qty) qty.value = "1";
-            const size = document.getElementById(`size-${idx}`);
-            if (size) size.selectedIndex = 0;
-          });
-        } else {
-          document.getElementById("result").innerHTML =
-            `<p><b>Något gick fel.</b> Försök igen.</p>`;
-        }
-      });
+      // Always use the cart modal to send orders for clarity
     });
 
     document.getElementById('cart-modal-submit').onclick = function() {
-      // Validate name/email before sending order!
       const name = document.querySelector('input[name="name"]').value.trim();
       const email = document.querySelector('input[name="email"]').value.trim();
       const errorDiv = document.getElementById('cart-modal-result');
@@ -780,25 +728,34 @@ h2 {
       errorDiv.textContent = "";
       submitOrder(name, email, function(success, name) {
         if (success) {
-          errorDiv.innerHTML = `<p><b>Order skickad!</b> Tack, ${name}.</p>`;
+          // Clear cart and show thank you
           orders = [];
           renderOrderTable();
           renderCartBar();
           renderCartModal();
           document.getElementById("orderForm").reset();
-          closeCartModal();
+          products.forEach((p, idx) => {
+            const qty = document.getElementById(`qty-${idx}`);
+            if (qty) qty.value = "1";
+            const size = document.getElementById(`size-${idx}`);
+            if (size) size.selectedIndex = 0;
+          });
+          // Show "thank you" centered
+          errorDiv.innerHTML = `<p style="font-size:1.3em;margin:2em 0 2em 0;color:var(--rhinos-red);font-weight:700;">Order skickad! Tack, ${name}.</p>`;
+          document.getElementById("cart-modal-submit").style.display = "none";
+          document.getElementById("cart-items-list").innerHTML = "";
+          document.getElementById("cart-modal-total").textContent = "";
+          document.getElementById("cart-bar").style.display = "none";
+          setTimeout(closeCartModal, 1300);
         } else {
           errorDiv.innerHTML = `<p><b>Något gick fel.</b> Försök igen.</p>`;
         }
-      }, true);
+      });
     };
 
-    // Initial render/hide
     renderOrderTable();
     renderCartBar();
     renderCartModal();
-
-    // Rerender cart bar/modal on resize
     window.addEventListener('resize', function() {
       renderCartBar();
       renderCartModal();
