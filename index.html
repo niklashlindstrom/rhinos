@@ -335,9 +335,32 @@ h2 {
   box-shadow: 0 2px 0 #3332;
   cursor: pointer;
   transition: background 0.2s;
+  position: relative;
 }
-.cart-modal-submit:hover {
-  background: var(--rhinos-red);
+.cart-modal-submit[disabled] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.cart-modal-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--rhinos-red);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  animation: spin 1s linear infinite;
+  margin: 1.3em auto 1.5em auto;
+  display: block;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+.cart-modal-thankyou {
+  font-size: 1.35em;
+  margin: 2em 0 2em 0;
+  color: var(--rhinos-red);
+  font-weight: 700;
+  text-align: center;
 }
 @media (max-width: 500px) {
   .form-area, .header-bar {
@@ -362,7 +385,7 @@ h2 {
 <body>
   <div class="header-bar">
     <img src="https://borasrhinos.web.sportadmin.se/im/hemsidaLogga/939/22639/_genLogga.png?v=19" class="logo" alt="Borås Rhinos Logo">
-    <h1>Borås Rhinos<br>Beställ klubbkläder</h1>
+    <h1>Borås Rhinos<br>Klubbkläder</h1>
   </div>
   <div class="form-area">
     <form id="orderForm" autocomplete="off">
@@ -392,12 +415,14 @@ h2 {
         </div>
         <form class="cart-modal-form" id="cart-modal-form" autocomplete="off" onsubmit="return false;">
           <label>Namn:
-            <input type="text" id="cart-name" required>
+            <input type="text" id="cart-name" required autocomplete="name">
           </label>
           <label>Email:
-            <input type="email" id="cart-email" required>
+            <input type="email" id="cart-email" required autocomplete="email">
           </label>
-          <button type="button" class="cart-modal-submit" id="cart-modal-submit">Skicka Order</button>
+          <button type="button" class="cart-modal-submit" id="cart-modal-submit">
+            Skicka Order
+          </button>
           <div id="cart-modal-result" style="text-align:center;margin-top:1em;"></div>
         </form>
       </div>
@@ -450,6 +475,7 @@ h2 {
     ];
     let orders = [];
 
+    // Render product cards
     function renderProductList() {
       const list = document.getElementById("product-list");
       list.innerHTML = "";
@@ -510,7 +536,7 @@ h2 {
     window.updateQty = updateQty;
     window.removeOrder = removeOrder;
 
-    // ----------- CART BAR + MODAL ------------
+    // CART BAR + MODAL
     function renderCartBar() {
       const bar = document.getElementById('cart-bar');
       const badge = document.getElementById('cart-badge');
@@ -528,8 +554,16 @@ h2 {
       }
     }
 
+    // Fix for mobile: prevent modal from closing or losing focus when editing number input
+    function attachMobileQtyListeners() {
+      document.querySelectorAll('.cart-item-actions input[type="number"]').forEach((input, idx) => {
+        input.onfocus = function(e) { e.stopPropagation(); };
+        input.ontouchstart = function(e) { e.stopPropagation(); };
+        input.onmousedown = function(e) { e.stopPropagation(); };
+      });
+    }
+
     function renderCartModal() {
-      const modal = document.getElementById('cart-modal');
       const list = document.getElementById('cart-items-list');
       const totalEl = document.getElementById('cart-modal-total');
       list.innerHTML = "";
@@ -549,14 +583,12 @@ h2 {
             <button class="cart-item-remove" onclick="removeOrder(${idx})">Ta bort</button>
           </div>
         `;
-        // Allow keyboard input to persist on mobile
-        li.querySelector('input[type="number"]').addEventListener('touchstart', function(e) {
-          e.stopPropagation();
-        });
         list.appendChild(li);
       });
       totalEl.textContent = `Totalt: ${totalKr} kr`;
       document.getElementById("cart-modal-submit").style.display = orders.length ? "" : "none";
+      document.getElementById("cart-modal-form").style.display = orders.length ? "" : "none";
+      attachMobileQtyListeners();
     }
 
     function openCartModal() {
@@ -566,7 +598,6 @@ h2 {
         document.getElementById('cart-modal').classList.add('open');
       }, 10);
       renderCartModal();
-      // Fill name/email from localstorage if available
       document.getElementById('cart-name').value = localStorage.getItem('cartName') || '';
       document.getElementById('cart-email').value = localStorage.getItem('cartEmail') || '';
       document.getElementById('cart-modal-result').textContent = '';
@@ -620,6 +651,7 @@ h2 {
       });
     }
 
+    // Now submit from cart modal!
     document.getElementById('cart-modal-submit').onclick = function() {
       const name = document.getElementById('cart-name').value.trim();
       const email = document.getElementById('cart-email').value.trim();
@@ -634,7 +666,9 @@ h2 {
         document.getElementById('cart-email').focus();
         return;
       }
-      errorDiv.textContent = "";
+      errorDiv.innerHTML = '<span class="cart-modal-spinner"></span>';
+      document.getElementById('cart-modal-submit').setAttribute('disabled', 'disabled');
+      // Save name/email for next time (in browser)
       localStorage.setItem('cartName', name);
       localStorage.setItem('cartEmail', email);
       submitOrder(name, email, function(success, name) {
@@ -648,18 +682,19 @@ h2 {
             const size = document.getElementById(`size-${idx}`);
             if (size) size.selectedIndex = 0;
           });
-          errorDiv.innerHTML = `<p style="font-size:1.3em;margin:2em 0 2em 0;color:var(--rhinos-red);font-weight:700;">Order skickad! Tack, ${name}.</p>`;
+          errorDiv.innerHTML = `<div class="cart-modal-thankyou">Order skickad!<br><span style="font-size:0.85em">Tack, ${name}.</span></div>`;
           document.getElementById("cart-modal-submit").style.display = "none";
           document.getElementById("cart-items-list").innerHTML = "";
           document.getElementById("cart-modal-total").textContent = "";
-          document.getElementById("cart-modal-form").style.display = "none";
-          document.getElementById("cart-bar").style.display = "none";
           setTimeout(() => {
             closeCartModal();
+            document.getElementById('cart-modal-submit').removeAttribute('disabled');
             document.getElementById("cart-modal-form").style.display = "";
-          }, 1300);
+            errorDiv.textContent = "";
+          }, 4000);
         } else {
           errorDiv.innerHTML = `<p><b>Något gick fel.</b> Försök igen.</p>`;
+          document.getElementById('cart-modal-submit').removeAttribute('disabled');
         }
       });
     };
