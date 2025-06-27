@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Borås Rhinos - Klubbkläder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -17,15 +15,15 @@
       font-family: 'Roboto', Arial, sans-serif;
       background: var(--rhinos-gray);
       color: var(--rhinos-black);
-      padding: 0;
       margin: 0;
+      padding: 0;
     }
     .container {
-      max-width: 480px;
+      max-width: 520px;
       background: var(--rhinos-white);
       margin: 2em auto;
       border-radius: 18px;
-      box-shadow: 0 8px 36px 0 rgba(30,30,30,0.08);
+      box-shadow: 0 8px 36px 0 rgba(30,30,30,0.09);
       padding: 2em 2em 1.5em 2em;
       border: 3px solid var(--rhinos-red);
       position: relative;
@@ -57,9 +55,9 @@
     }
     h2 {
       color: var(--rhinos-black);
-      margin-top: 1.6em;
-      margin-bottom: 0.8em;
-      font-size: 1.15em;
+      margin-top: 1.7em;
+      margin-bottom: 1em;
+      font-size: 1.19em;
       letter-spacing: 0.5px;
     }
     form label {
@@ -69,7 +67,7 @@
       font-weight: 500;
       font-size: 1em;
     }
-    input[type="text"], input[type="email"], select, input[type="number"] {
+    input[type="text"], input[type="email"] {
       width: 100%;
       padding: 0.6em 0.8em;
       border-radius: 7px;
@@ -80,37 +78,87 @@
       transition: border-color 0.2s;
       background: #f8f8f8;
     }
-    input[type="text"]:focus, input[type="email"]:focus, select:focus, input[type="number"]:focus {
+    input[type="text"]:focus, input[type="email"]:focus {
       border-color: var(--rhinos-red);
       outline: none;
       background: #fff;
     }
-    select {
-      cursor: pointer;
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5em;
+      margin-bottom: 2.2em;
     }
-    .section {
-      margin-bottom: 2.1em;
+    .product-card {
+      background: #fff;
+      border-radius: 10px;
+      border: 2px solid #ececec;
+      box-shadow: 0 2.5px 0 #b4001920;
+      padding: 1em 1em 0.7em 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45em;
+      position: relative;
+    }
+    .product-header {
+      font-size: 1.05em;
+      font-weight: 700;
+      color: var(--rhinos-red);
+      margin-bottom: 0.18em;
+    }
+    .product-desc {
+      color: #555;
+      font-size: 0.97em;
+      margin-bottom: 0.5em;
+    }
+    .product-row {
+      display: flex;
+      gap: 0.7em;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .product-row select, .product-row input[type="number"] {
+      padding: 0.4em 0.7em;
+      border-radius: 7px;
+      border: 1.5px solid #bbb;
+      font-size: 1em;
+      background: #fafafa;
+      min-width: 80px;
+      transition: border-color 0.2s;
+    }
+    .product-row select:focus, .product-row input[type="number"]:focus {
+      border-color: var(--rhinos-red);
+      background: #fff;
+    }
+    .price-label {
+      color: var(--rhinos-black);
+      font-size: 1em;
+      font-weight: 600;
+      margin-top: 0.2em;
+      margin-bottom: 0.6em;
+      background: #f8f6f6;
+      display: inline-block;
+      padding: 0.18em 0.7em;
+      border-radius: 6px;
+      border: 1px solid #f0eded;
     }
     .add-btn {
       background: var(--rhinos-red);
       color: var(--rhinos-white);
       border: none;
       border-radius: 7px;
-      padding: 0.52em 1.3em;
+      padding: 0.42em 1.1em;
       font-size: 1em;
       cursor: pointer;
-      margin-top: 0.3em;
-      margin-bottom: 1.1em;
-      transition: background 0.2s;
+      margin-bottom: 0.3em;
       font-weight: 500;
       box-shadow: 0 1.5px 0 #b4001999;
+      transition: background 0.2s;
     }
-    .add-btn:hover {
-      background: #930016;
-    }
+    .add-btn:hover { background: #930016; }
     .submit-btn {
       padding: 1em 2em;
-      font-size: 1.11em;
+      font-size: 1.13em;
       background: var(--rhinos-black);
       border: none;
       border-radius: 8px;
@@ -123,9 +171,7 @@
       box-shadow: 0 1.5px 0 #33333320;
       transition: background 0.2s;
     }
-    .submit-btn:hover {
-      background: var(--rhinos-red);
-    }
+    .submit-btn:hover { background: var(--rhinos-red); }
     #result {
       background: #fff9f9;
       color: var(--rhinos-black);
@@ -172,19 +218,20 @@
     .remove-btn:hover {
       background: var(--rhinos-red);
     }
-    @media (max-width: 520px) {
-      .container {
-        padding: 0.9em 0.2em 1.2em 0.2em;
-      }
-      .logo-box img {
-        height: 40px;
-      }
-      h2 {
-        font-size: 1em;
-      }
-      th, td {
-        font-size: 0.98em;
-      }
+    .order-total {
+      text-align: right;
+      font-weight: 700;
+      color: var(--rhinos-red);
+      font-size: 1.12em;
+      margin-top: 0.5em;
+    }
+    @media (max-width: 540px) {
+      .container { padding: 0.9em 0.1em 1.2em 0.1em; }
+      .logo-box img { height: 40px; }
+      h2 { font-size: 1em; }
+      th, td { font-size: 0.98em; }
+      .product-list { gap: 0.9em; }
+      .product-card { padding: 0.8em 0.6em 0.6em 0.7em; }
     }
   </style>
 </head>
@@ -201,105 +248,168 @@
       <label>Email:
         <input type="email" name="email" required>
       </label>
-      <div class="section">
-        <h2>Beställ produkter</h2>
-        <div style="display: flex; gap: 0.5em; flex-wrap: wrap;">
-          <select id="item-select">
-            <option value="">Välj produkt</option>
-            <option value="Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)">Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)</option>
-            <option value="Träningsshorts (Rhinos-tryck på benet)">Träningsshorts (Rhinos-tryck på benet)</option>
-            <option value="Sweat pants (Rhinos-tryck på benet)">Sweat pants (Rhinos-tryck på benet)</option>
-            <option value="Keps med Rhinos-tryck">Keps med Rhinos-tryck</option>
-          </select>
-          <select id="size-select" style="display:none">
-            <option value="">Välj storlek</option>
-          </select>
-          <button type="button" class="add-btn" onclick="addOrder()">Lägg till</button>
-        </div>
-        <table id="order-table" style="display:none;">
-          <thead>
-            <tr>
-              <th>Produkt</th>
-              <th>Storlek</th>
-              <th>Antal</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+      <h2>Beställ produkter</h2>
+      <div class="product-list" id="product-list"></div>
+      <table id="order-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Produkt</th>
+            <th>Storlek</th>
+            <th>Antal</th>
+            <th>Pris</th>
+            <th>Totalt</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="order-total" class="order-total" style="display:none;"></div>
       <button type="submit" class="submit-btn">Skicka Order</button>
     </form>
     <div id="result"></div>
   </div>
   <script>
-    // Size options for each item
-    const sizeOptions = {
-      "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)": ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
-      "Träningsshorts (Rhinos-tryck på benet)": ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"],
-      "Sweat pants (Rhinos-tryck på benet)": ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"],
-      "Keps med Rhinos-tryck": [] // No size!
-    };
+    // Example products/pricing:
+    const products = [
+      {
+        name: "Hoodie med dragkedja",
+        desc: "Rhinos-tryck stort på ryggen, litet på bröstet",
+        key: "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)",
+        sizePrices: {
+          "90": 400, "100": 400, "110": 400, "120": 400, "130": 400, "140": 400, "150": 400, "160": 400,
+          "XS": 500, "S": 500, "M": 500, "L": 500, "XL": 500, "XXL": 500, "XXXL": 500
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"]
+      },
+      {
+        name: "Träningsshorts",
+        desc: "Rhinos-tryck på benet",
+        key: "Träningsshorts (Rhinos-tryck på benet)",
+        sizePrices: {
+          "90": 200, "100": 200, "110": 200, "120": 200, "130": 200, "140": 200, "150": 200, "160": 200,
+          "S": 250, "M": 250, "L": 250, "XL": 250, "XXL": 250
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"]
+      },
+      {
+        name: "Sweat pants",
+        desc: "Rhinos-tryck på benet",
+        key: "Sweat pants (Rhinos-tryck på benet)",
+        sizePrices: {
+          "90": 350, "100": 350, "110": 350, "120": 350, "130": 350, "140": 350, "150": 350,
+          "S": 450, "M": 450, "L": 450, "XL": 450, "XXL": 450
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
+      },
+      {
+        name: "Keps med Rhinos-tryck",
+        desc: "",
+        key: "Keps med Rhinos-tryck",
+        sizePrices: { "": 175 },
+        sizes: [""]
+      }
+    ];
     let orders = [];
 
-    // Dynamically update sizes based on selected item
-    document.getElementById("item-select").addEventListener("change", function() {
-      const item = this.value;
-      const sizeSelect = document.getElementById("size-select");
-      sizeSelect.innerHTML = '<option value="">Välj storlek</option>';
-      if (item && sizeOptions[item] && sizeOptions[item].length > 0) {
-        sizeOptions[item].forEach(size => {
-          let opt = document.createElement("option");
-          opt.value = size;
-          opt.textContent = size;
-          sizeSelect.appendChild(opt);
-        });
-        sizeSelect.style.display = "";
-      } else {
-        sizeSelect.style.display = "none";
-      }
-    });
+    // Render product cards
+    function renderProductList() {
+      const list = document.getElementById("product-list");
+      list.innerHTML = "";
+      products.forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        const sizeId = `size-${idx}`;
+        const qtyId = `qty-${idx}`;
+        card.innerHTML = `
+          <div class="product-header">${p.name}</div>
+          ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ""}
+          <div class="product-row">
+            ${p.sizes.length > 1
+              ? `<select id="${sizeId}" onchange="showPrice(${idx})">
+                   <option value="">Välj storlek</option>
+                   ${p.sizes.map(s => `<option value="${s}">${s} (${p.sizePrices[s]} kr)</option>`).join("")}
+                 </select>`
+              : ""}
+            <input type="number" min="1" value="1" id="${qtyId}" style="width:70px;">
+            <button type="button" class="add-btn" onclick="addOrder(${idx})">Lägg till</button>
+          </div>
+          <div id="price-label-${idx}" class="price-label" style="display:none;"></div>
+        `;
+        list.appendChild(card);
+      });
+    }
+    renderProductList();
 
-    function addOrder() {
-      const item = document.getElementById("item-select").value;
-      const sizeSelect = document.getElementById("size-select");
-      const size = sizeSelect.style.display === "none" ? "" : sizeSelect.value;
-      if (!item) return;
-      // Prevent duplicates: item+size combo
-      if (orders.find(o => o.item === item && o.size === size)) {
+    function showPrice(idx) {
+      const p = products[idx];
+      const size = document.getElementById(`size-${idx}`)?.value || "";
+      const label = document.getElementById(`price-label-${idx}`);
+      if (size && p.sizePrices[size] != null) {
+        label.textContent = `Pris: ${p.sizePrices[size]} kr`;
+        label.style.display = "inline-block";
+      } else {
+        label.textContent = "";
+        label.style.display = "none";
+      }
+    }
+    window.showPrice = showPrice;
+
+    // Add order from card
+    function addOrder(idx) {
+      const p = products[idx];
+      const size = p.sizes.length > 1 ? document.getElementById(`size-${idx}`).value : "";
+      const qty = Math.max(1, parseInt(document.getElementById(`qty-${idx}`).value) || 1);
+      if (p.sizes.length > 1 && (!size || p.sizePrices[size] == null)) {
+        alert("Välj storlek.");
+        return;
+      }
+      const price = p.sizePrices[size] || 0;
+      // Prevent duplicates: product+size combo
+      if (orders.find(o => o.item === p.key && o.size === size)) {
         alert("Redan tillagd.");
         return;
       }
-      orders.push({ item, size, quantity: 1 });
+      orders.push({ item: p.key, size, quantity: qty, price });
       renderOrderTable();
     }
+    window.addOrder = addOrder;
 
     function renderOrderTable() {
       const table = document.getElementById("order-table");
       const tbody = table.querySelector("tbody");
       tbody.innerHTML = "";
+      let total = 0;
       orders.forEach((o, idx) => {
+        const rowTotal = o.price * o.quantity;
+        total += rowTotal;
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${o.item}</td>
           <td>${o.size ? o.size : "-"}</td>
-          <td><input type="number" min="1" value="${o.quantity}" onchange="updateQty(${idx}, this.value)"></td>
+          <td><input type="number" min="1" value="${o.quantity}" onchange="updateQty(${idx}, this.value)" style="width:60px;"></td>
+          <td>${o.price} kr</td>
+          <td>${rowTotal} kr</td>
           <td><button type="button" class="remove-btn" onclick="removeOrder(${idx})">Ta bort</button></td>
         `;
         tbody.appendChild(tr);
       });
       table.style.display = orders.length ? "" : "none";
+      const orderTotal = document.getElementById("order-total");
+      if (orders.length) {
+        orderTotal.style.display = "";
+        orderTotal.innerHTML = `Totalt: <span>${total} kr</span>`;
+      } else {
+        orderTotal.style.display = "none";
+      }
     }
-
     function updateQty(idx, value) {
       orders[idx].quantity = Math.max(1, parseInt(value) || 1);
+      renderOrderTable();
     }
-
     function removeOrder(idx) {
       orders.splice(idx, 1);
       renderOrderTable();
     }
-
     window.updateQty = updateQty;
     window.removeOrder = removeOrder;
 
@@ -312,20 +422,20 @@
         alert("Lägg till minst en produkt.");
         return;
       }
-      // Send each order line as a row to Google Sheet via Apps Script Web App
       let sent = 0;
       let failed = 0;
       orders.forEach((order, i) => {
         fetch("https://script.google.com/macros/s/AKfycbzV_Li1OuPfBPgjAaYehzbaWpebXpxdbY6o0dtjwxIcXnp4bXmLw5mi7AUSP9R_Nf74ow/exec", {
           method: "POST",
-          mode: "no-cors", // This disables CORS checks, but...
+          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name,
             email,
             item: order.item,
             size: order.size,
-            quantity: order.quantity
+            quantity: order.quantity,
+            price: order.price
           })
         })
         .then(() => {
@@ -336,6 +446,15 @@
             orders = [];
             renderOrderTable();
             document.getElementById("orderForm").reset();
+            // Reset price labels
+            products.forEach((p, idx) => {
+              const label = document.getElementById(`price-label-${idx}`);
+              if (label) { label.textContent = ""; label.style.display = "none"; }
+              const qty = document.getElementById(`qty-${idx}`);
+              if (qty) qty.value = "1";
+              const size = document.getElementById(`size-${idx}`);
+              if (size) size.selectedIndex = 0;
+            });
           }
         })
         .catch(() => {
