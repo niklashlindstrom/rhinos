@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Team Clothing Order Form</title>
+  <title>Borås Rhinos - klubbkläder</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 2em; }
     .section { margin-bottom: 2em; }
@@ -18,7 +18,7 @@
   </style>
 </head>
 <body>
-  <h1>Team Clothing Order Form</h1>
+  <h1>Borås Rhinos - klubbkläder</h1>
   <form id="orderForm" autocomplete="off">
     <div>
       <label>Name: <input type="text" name="name" required></label>
@@ -27,63 +27,69 @@
       <label>Email: <input type="email" name="email" required></label>
     </div>
     <div class="section">
-      <h2>Order Item</h2>
+      <h2>Beställ</h2>
       <select id="item-select">
-        <option value="">Select item</option>
-        <option value="Hoodie (zip)">Hoodie (zip)</option>
-        <option value="Shorts">Shorts</option>
-        <option value="Collage Pants">Collage Pants</option>
+        <option value="">Välj produkt</option>
+        <option value="Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)">Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)</option>
+        <option value="Träningsshorts (Rhinos-tryck på benet)">Träningsshorts (Rhinos-tryck på benet)</option>
+        <option value="Sweat pants (Rhinos-tryck på benet)">Sweat pants (Rhinos-tryck på benet)</option>
+        <option value="Keps med Rhinos-tryck">Keps med Rhinos-tryck</option>
       </select>
-      <select id="size-select">
-        <option value="">Select size</option>
+      <select id="size-select" style="display:none">
+        <option value="">Välj storlek</option>
       </select>
-      <button type="button" class="add-btn" onclick="addOrder()">Add</button>
+      <button type="button" class="add-btn" onclick="addOrder()">Lägg till</button>
       <table id="order-table" style="display:none; margin-top:1em;">
         <thead>
           <tr>
-            <th>Item</th>
-            <th>Size</th>
-            <th>Quantity</th>
+            <th>Produkt</th>
+            <th>Storlek</th>
+            <th>Antal</th>
             <th></th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-    <button type="submit" class="submit-btn">Submit Order</button>
+    <button type="submit" class="submit-btn">Skicka Order</button>
   </form>
   <div id="result"></div>
   <script>
     // Size options for each item
     const sizeOptions = {
-      "Hoodie (zip)": ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
-      "Shorts": ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"],
-      "Collage Pants": ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
+      "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)": ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
+      "Träningsshorts (Rhinos-tryck på benet)": ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"],
+      "Sweat pants (Rhinos-tryck på benet)": ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"],
+      "Keps med Rhinos-tryck": [] // No size!
     };
     let orders = [];
 
     // Dynamically update sizes based on selected item
-    document.getElementById("item-select").addEventListener("change", function() {
+   document.getElementById("item-select").addEventListener("change", function() {
       const item = this.value;
       const sizeSelect = document.getElementById("size-select");
-      sizeSelect.innerHTML = '<option value="">Select size</option>';
-      if (item && sizeOptions[item]) {
+      sizeSelect.innerHTML = '<option value="">Välj storlek</option>';
+      if (item && sizeOptions[item] && sizeOptions[item].length > 0) {
         sizeOptions[item].forEach(size => {
           let opt = document.createElement("option");
           opt.value = size;
           opt.textContent = size;
           sizeSelect.appendChild(opt);
         });
+        sizeSelect.style.display = "";
+      } else {
+        sizeSelect.style.display = "none";
       }
     });
 
     function addOrder() {
       const item = document.getElementById("item-select").value;
-      const size = document.getElementById("size-select").value;
-      if (!item || !size) return;
-      // Prevent duplicates
+      const sizeSelect = document.getElementById("size-select");
+      const size = sizeSelect.style.display === "none" ? "" : sizeSelect.value;
+      if (!item) return;
+      // Prevent duplicates: item+size combo
       if (orders.find(o => o.item === item && o.size === size)) {
-        alert("Already added this item/size.");
+        alert("Redan tillagd.");
         return;
       }
       orders.push({ item, size, quantity: 1 });
@@ -149,7 +155,7 @@
           sent++;
           if (sent + failed === orders.length) {
             document.getElementById("result").innerHTML =
-              `<p><b>Order submitted!</b> Thank you, ${name}.</p>`;
+              `<p><b>Order skickad!</b> Tack, ${name}.</p>`;
             orders = [];
             renderOrderTable();
             document.getElementById("orderForm").reset();
