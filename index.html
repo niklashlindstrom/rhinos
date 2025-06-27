@@ -101,14 +101,20 @@
       position: relative;
     }
     .product-header {
-      font-size: 1.05em;
+      font-size: 1.08em;
       font-weight: 700;
       color: var(--rhinos-red);
-      margin-bottom: 0.18em;
+      margin-bottom: 0.15em;
     }
     .product-desc {
       color: #555;
-      font-size: 0.97em;
+      font-size: 0.96em;
+      margin-bottom: 0.15em;
+    }
+    .product-priceinfo {
+      color: #222;
+      font-size: 0.98em;
+      font-weight: 500;
       margin-bottom: 0.5em;
     }
     .product-row {
@@ -129,18 +135,6 @@
     .product-row select:focus, .product-row input[type="number"]:focus {
       border-color: var(--rhinos-red);
       background: #fff;
-    }
-    .price-label {
-      color: var(--rhinos-black);
-      font-size: 1em;
-      font-weight: 600;
-      margin-top: 0.2em;
-      margin-bottom: 0.6em;
-      background: #f8f6f6;
-      display: inline-block;
-      padding: 0.18em 0.7em;
-      border-radius: 6px;
-      border: 1px solid #f0eded;
     }
     .add-btn {
       background: var(--rhinos-red);
@@ -269,43 +263,47 @@
     <div id="result"></div>
   </div>
   <script>
-    // Example products/pricing:
+    // Produktdata och priser (ändra fritt!)
     const products = [
       {
         name: "Hoodie med dragkedja",
         desc: "Rhinos-tryck stort på ryggen, litet på bröstet",
+        priceInfo: "Barn: 250 kr, Vuxen: 350 kr",
         key: "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)",
         sizePrices: {
-          "90": 400, "100": 400, "110": 400, "120": 400, "130": 400, "140": 400, "150": 400, "160": 400,
-          "XS": 500, "S": 500, "M": 500, "L": 500, "XL": 500, "XXL": 500, "XXXL": 500
+          "90": 250, "100": 250, "110": 250, "120": 250, "130": 250, "140": 250, "150": 250, "160": 250,
+          "XS": 350, "S": 350, "M": 350, "L": 350, "XL": 350, "XXL": 350, "XXXL": 350
         },
         sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"]
       },
       {
         name: "Träningsshorts",
         desc: "Rhinos-tryck på benet",
+        priceInfo: "Barn: 150 kr, Vuxen: 200 kr",
         key: "Träningsshorts (Rhinos-tryck på benet)",
         sizePrices: {
-          "90": 200, "100": 200, "110": 200, "120": 200, "130": 200, "140": 200, "150": 200, "160": 200,
-          "S": 250, "M": 250, "L": 250, "XL": 250, "XXL": 250
+          "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150, "160": 150,
+          "S": 200, "M": 200, "L": 200, "XL": 200, "XXL": 200
         },
         sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"]
       },
       {
         name: "Sweat pants",
         desc: "Rhinos-tryck på benet",
+        priceInfo: "Barn: 150 kr, Vuxen: 250 kr",
         key: "Sweat pants (Rhinos-tryck på benet)",
         sizePrices: {
-          "90": 350, "100": 350, "110": 350, "120": 350, "130": 350, "140": 350, "150": 350,
-          "S": 450, "M": 450, "L": 450, "XL": 450, "XXL": 450
+          "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150,
+          "S": 250, "M": 250, "L": 250, "XL": 250, "XXL": 250
         },
         sizes: ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
       },
       {
         name: "Keps med Rhinos-tryck",
         desc: "",
+        priceInfo: "Pris: 150 kr",
         key: "Keps med Rhinos-tryck",
-        sizePrices: { "": 175 },
+        sizePrices: { "": 150 },
         sizes: [""]
       }
     ];
@@ -323,9 +321,10 @@
         card.innerHTML = `
           <div class="product-header">${p.name}</div>
           ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ""}
+          <div class="product-priceinfo">${p.priceInfo}</div>
           <div class="product-row">
             ${p.sizes.length > 1
-              ? `<select id="${sizeId}" onchange="showPrice(${idx})">
+              ? `<select id="${sizeId}">
                    <option value="">Välj storlek</option>
                    ${p.sizes.map(s => `<option value="${s}">${s} (${p.sizePrices[s]} kr)</option>`).join("")}
                  </select>`
@@ -333,26 +332,11 @@
             <input type="number" min="1" value="1" id="${qtyId}" style="width:70px;">
             <button type="button" class="add-btn" onclick="addOrder(${idx})">Lägg till</button>
           </div>
-          <div id="price-label-${idx}" class="price-label" style="display:none;"></div>
         `;
         list.appendChild(card);
       });
     }
     renderProductList();
-
-    function showPrice(idx) {
-      const p = products[idx];
-      const size = document.getElementById(`size-${idx}`)?.value || "";
-      const label = document.getElementById(`price-label-${idx}`);
-      if (size && p.sizePrices[size] != null) {
-        label.textContent = `Pris: ${p.sizePrices[size]} kr`;
-        label.style.display = "inline-block";
-      } else {
-        label.textContent = "";
-        label.style.display = "none";
-      }
-    }
-    window.showPrice = showPrice;
 
     // Add order from card
     function addOrder(idx) {
@@ -446,10 +430,8 @@
             orders = [];
             renderOrderTable();
             document.getElementById("orderForm").reset();
-            // Reset price labels
+            // Reset inputs
             products.forEach((p, idx) => {
-              const label = document.getElementById(`price-label-${idx}`);
-              if (label) { label.textContent = ""; label.style.display = "none"; }
               const qty = document.getElementById(`qty-${idx}`);
               if (qty) qty.value = "1";
               const size = document.getElementById(`size-${idx}`);
