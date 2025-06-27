@@ -263,9 +263,43 @@ h2 {
   display: flex;
   gap: 0.6em;
   margin-top: 0.3em;
+  align-items: center;
+}
+.cart-item-qtybox {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.cart-qty-btn {
+  background: var(--rhinos-red);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.15em;
+  width: 30px;
+  height: 30px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s;
+  outline: none;
+  user-select: none;
+}
+.cart-qty-btn:active, .cart-qty-btn:focus {
+  background: #900013;
+}
+.cart-item-qtynum {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  font-size: 1.07em;
+  font-weight: 600;
+  color: var(--rhinos-black);
 }
 .cart-item-remove {
-  background: var(--rhinos-red);
+  background: var(--rhinos-black);
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -273,7 +307,10 @@ h2 {
   padding: 0.3em 0.8em;
   cursor: pointer;
   font-weight: 600;
+  margin-left: 0.5em;
+  transition: background 0.18s;
 }
+.cart-item-remove:hover { background: var(--rhinos-red); }
 .cart-modal-total {
   font-size: 1.08em;
   font-weight: 700;
@@ -457,7 +494,7 @@ h2 {
         key: "Träningsshorts (Rhinos-tryck på benet)",
         sizePrices: {
           "90": 150, "100": 150, "110": 150, "120": 150, "130": 150, "140": 150, "150": 150, "160": 150,
-          "S": 200, "M": 200, "L": 200, "XL": 200, "XXL": 200
+          "S": 250, "M": 250, "L": 250, "XL": 250, "XXL": 250
         },
         sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"]
       },
@@ -473,19 +510,26 @@ h2 {
         sizes: ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
       },
       {
+        name: "T-shirt",
+        desc: "Svart bomullstshirt med litet Rhinos-tryck på bröstet",
+        priceInfo: "Pris: 99 kr",
+        key: "Svart T-shirt (Rhinos-tryck på bröstet)",
+        sizePrices: {
+          "90": 99, "100": 99, "110": 99, "120": 99, "130": 99, "140": 99, "150": 99, "160": 99,
+          "XS": 99, "S": 99, "M": 99, "L": 99, "XL": 99, "XXL": 99
+        },
+        sizes: ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"]
+      },
+      {
         name: "Keps med Rhinos-tryck",
         desc: "",
-        priceInfo: "Pris: 150 kr",
+        priceInfo: "Pris: 225 kr",
         key: "Keps med Rhinos-tryck",
-        sizePrices: { "": 150 },
+        sizePrices: { "": 225 },
         sizes: [""]
       }
     ];
     let orders = [];
-
-    function isMobile() {
-      return window.matchMedia('(max-width: 1000px)').matches;
-    }
 
     function renderProductList() {
       const list = document.getElementById("product-list");
@@ -549,7 +593,13 @@ h2 {
       }
     }
 
-    // Only re-render bar/modal, never focus or keyboard
+    function changeQty(idx, delta) {
+      let o = orders[idx];
+      o.quantity = Math.max(1, o.quantity + delta);
+      renderCartBar();
+      renderCartModal();
+    }
+
     function renderCartModal() {
       const list = document.getElementById('cart-items-list');
       const totalEl = document.getElementById('cart-modal-total');
@@ -563,10 +613,16 @@ h2 {
         li.innerHTML = `
           <div class="cart-item-row">
             <div class="cart-item-main">${o.item}</div>
-            <div class="cart-item-details">${o.size ? "Storlek: " + o.size + " &nbsp; " : ""}${o.price} kr x <span id="cart-qty-view-${idx}">${o.quantity}</span></div>
+            <div class="cart-item-details">${o.size ? "Storlek: " + o.size + " &nbsp; " : ""}${o.price} kr x 
+              <span class="cart-item-qtynum">${o.quantity}</span>
+            </div>
           </div>
           <div class="cart-item-actions">
-            <input type="number" min="1" value="${o.quantity}" data-idx="${idx}" class="cart-qty-input" style="width:56px;">
+            <div class="cart-item-qtybox">
+              <button class="cart-qty-btn" onclick="changeQty(${idx},-1)" aria-label="Minska antal">−</button>
+              <span class="cart-item-qtynum">${o.quantity}</span>
+              <button class="cart-qty-btn" onclick="changeQty(${idx},1)" aria-label="Öka antal">+</button>
+            </div>
             <button class="cart-item-remove" onclick="removeOrder(${idx})">Ta bort</button>
           </div>
         `;
@@ -575,18 +631,8 @@ h2 {
       totalEl.textContent = `Totalt: ${totalKr} kr`;
       document.getElementById("cart-modal-submit").style.display = orders.length ? "" : "none";
       document.getElementById("cart-modal-form").style.display = orders.length ? "" : "none";
-
-      // Attach input event after DOM creation (to avoid rerendering modal)
-      document.querySelectorAll('.cart-qty-input').forEach(input => {
-        input.onchange = function() {
-          const idx = parseInt(input.getAttribute('data-idx'));
-          let val = Math.max(1, parseInt(input.value) || 1);
-          orders[idx].quantity = val;
-          document.getElementById(`cart-qty-view-${idx}`).textContent = val;
-          renderCartBar(); // only update bar
-        };
-      });
     }
+    window.changeQty = changeQty;
 
     function removeOrder(idx) {
       orders.splice(idx, 1);
@@ -595,7 +641,6 @@ h2 {
     }
     window.removeOrder = removeOrder;
 
-    // ----------- CART MODAL LOGIC ------------
     function openCartModal() {
       if (!orders.length) return;
       document.getElementById('cart-modal-backdrop').style.display = "flex";
@@ -625,7 +670,6 @@ h2 {
       if (e.target === this) closeCartModal();
     };
 
-    // ----------- ORDER SUBMIT ------------
     function showToast(msg, type) {
       const toast = document.getElementById('thankyou-toast');
       toast.textContent = msg;
@@ -711,7 +755,6 @@ h2 {
       });
     };
 
-    // Prevent desktop form submit
     document.getElementById("orderForm").addEventListener("submit", function(e) {
       e.preventDefault();
     });
