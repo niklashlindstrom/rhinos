@@ -57,30 +57,6 @@ body {
   box-sizing: border-box;
   margin-bottom: 3em;
 }
-form label {
-  font-weight: 500;
-  display: block;
-  margin-bottom: 0.5em;
-  font-size: 1em;
-  color: var(--rhinos-black);
-}
-input[type="text"], input[type="email"] {
-  width: 100%;
-  padding: 0.9em 1em;
-  border-radius: 8px;
-  border: 1.7px solid #d2d2d2;
-  background: #fff;
-  font-size: 1.12em;
-  margin-bottom: 1.2em;
-  margin-top: 0.1em;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
-input[type="text"]:focus, input[type="email"]:focus {
-  border-color: var(--rhinos-red);
-  outline: none;
-  background: #fff;
-}
 h2 {
   color: var(--rhinos-black);
   margin: 1.4em 0 1em 0;
@@ -336,6 +312,38 @@ td {
   margin: 0.7em 0 0.8em 0;
   color: var(--rhinos-red);
 }
+.cart-modal-info {
+  font-size: 1.05em;
+  color: #333;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  margin-bottom: 1.3em;
+  text-align: center;
+}
+.cart-modal-form label {
+  font-weight: 500;
+  color: #222;
+  font-size: 1em;
+  display: block;
+  margin-bottom: 0.3em;
+}
+.cart-modal-form input[type="text"], .cart-modal-form input[type="email"] {
+  width: 100%;
+  padding: 0.7em 1em;
+  border-radius: 7px;
+  border: 1.5px solid #bbb;
+  background: #fafafa;
+  font-size: 1em;
+  margin-bottom: 1em;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.cart-modal-form input[type="text"]:focus, .cart-modal-form input[type="email"]:focus {
+  border-color: var(--rhinos-red);
+  outline: none;
+  background: #fff;
+}
 .cart-modal-submit {
   background: var(--rhinos-black);
   color: #fff;
@@ -417,12 +425,6 @@ td {
   </div>
   <div class="form-area">
     <form id="orderForm" autocomplete="off">
-      <label>Namn:
-        <input type="text" name="name" required>
-      </label>
-      <label>Email:
-        <input type="email" name="email" required>
-      </label>
       <h2>Beställ produkter</h2>
       <div class="product-list" id="product-list"></div>
       <table id="order-table" style="display:none;">
@@ -458,8 +460,19 @@ td {
       <div class="cart-modal-content">
         <ul class="cart-items-list" id="cart-items-list"></ul>
         <div class="cart-modal-total" id="cart-modal-total"></div>
-        <button class="cart-modal-submit" id="cart-modal-submit">Skicka Order</button>
-        <div id="cart-modal-result" style="text-align:center;margin-top:1em;"></div>
+        <div class="cart-modal-info">
+          Vi meddelar när dina varor är redo, betalning sker samtidigt som varorna tas emot via Swish.
+        </div>
+        <form class="cart-modal-form" id="cart-modal-form" autocomplete="off" onsubmit="return false;">
+          <label>Namn:
+            <input type="text" id="cart-name" required>
+          </label>
+          <label>Email:
+            <input type="email" id="cart-email" required>
+          </label>
+          <button type="button" class="cart-modal-submit" id="cart-modal-submit">Skicka Order</button>
+          <div id="cart-modal-result" style="text-align:center;margin-top:1em;"></div>
+        </form>
       </div>
     </div>
   </div>
@@ -468,7 +481,7 @@ td {
     const products = [
       {
         name: "Hoodie med dragkedja",
-        desc: "Rhinos-tryck stort på ryggen, litet på bröstet",
+        desc: "Svart med Rhinos-tryck stort på ryggen, litet på bröstet",
         priceInfo: "Barn: 250 kr, Vuxen: 350 kr",
         key: "Hoodie med dragkedja (Rhinos-tryck stort på ryggen, litet på bröstet)",
         sizePrices: {
@@ -479,7 +492,7 @@ td {
       },
       {
         name: "Träningsshorts",
-        desc: "Rhinos-tryck på benet",
+        desc: "Svarta med Rhinos-tryck på benet",
         priceInfo: "Barn: 150 kr, Vuxen: 200 kr",
         key: "Träningsshorts (Rhinos-tryck på benet)",
         sizePrices: {
@@ -490,7 +503,7 @@ td {
       },
       {
         name: "Sweat pants",
-        desc: "Rhinos-tryck på benet",
+        desc: "Svarta med Rhinos-tryck på benet",
         priceInfo: "Barn: 150 kr, Vuxen: 250 kr",
         key: "Sweat pants (Rhinos-tryck på benet)",
         sizePrices: {
@@ -659,6 +672,11 @@ td {
         document.getElementById('cart-modal').classList.add('open');
       }, 10);
       renderCartModal();
+      // Fill name/email from localstorage if available
+      document.getElementById('cart-name').value = localStorage.getItem('cartName') || '';
+      document.getElementById('cart-email').value = localStorage.getItem('cartEmail') || '';
+      document.getElementById('cart-modal-result').textContent = '';
+      document.getElementById('cart-modal-submit').style.display = orders.length ? "" : "none";
     }
     function closeCartModal() {
       document.getElementById('cart-modal').classList.remove('open');
@@ -708,24 +726,25 @@ td {
       });
     }
 
-    document.getElementById("orderForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      // Always use the cart modal to send orders for clarity
-    });
-
+    // Now submit from cart modal!
     document.getElementById('cart-modal-submit').onclick = function() {
-      const name = document.querySelector('input[name="name"]').value.trim();
-      const email = document.querySelector('input[name="email"]').value.trim();
+      const name = document.getElementById('cart-name').value.trim();
+      const email = document.getElementById('cart-email').value.trim();
       const errorDiv = document.getElementById('cart-modal-result');
       if (!name) {
         errorDiv.textContent = "Fyll i ditt namn!";
+        document.getElementById('cart-name').focus();
         return;
       }
       if (!email) {
         errorDiv.textContent = "Fyll i din e-post!";
+        document.getElementById('cart-email').focus();
         return;
       }
       errorDiv.textContent = "";
+      // Save name/email for next time (in browser)
+      localStorage.setItem('cartName', name);
+      localStorage.setItem('cartEmail', email);
       submitOrder(name, email, function(success, name) {
         if (success) {
           // Clear cart and show thank you
@@ -733,7 +752,7 @@ td {
           renderOrderTable();
           renderCartBar();
           renderCartModal();
-          document.getElementById("orderForm").reset();
+          // Also reset product inputs
           products.forEach((p, idx) => {
             const qty = document.getElementById(`qty-${idx}`);
             if (qty) qty.value = "1";
@@ -745,13 +764,22 @@ td {
           document.getElementById("cart-modal-submit").style.display = "none";
           document.getElementById("cart-items-list").innerHTML = "";
           document.getElementById("cart-modal-total").textContent = "";
+          document.getElementById("cart-modal-form").style.display = "none";
           document.getElementById("cart-bar").style.display = "none";
-          setTimeout(closeCartModal, 1300);
+          setTimeout(() => {
+            closeCartModal();
+            document.getElementById("cart-modal-form").style.display = "";
+          }, 1300);
         } else {
           errorDiv.innerHTML = `<p><b>Något gick fel.</b> Försök igen.</p>`;
         }
       });
     };
+
+    // Prevent submitting the old desktop form
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+    });
 
     renderOrderTable();
     renderCartBar();
