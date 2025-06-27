@@ -70,7 +70,7 @@ input[type="text"], input[type="email"] {
   border-radius: 8px;
   border: 1.7px solid #d2d2d2;
   background: #fff;
-  font-size: 1.13em;
+  font-size: 1.12em;
   margin-bottom: 1.2em;
   margin-top: 0.1em;
   transition: border-color 0.2s;
@@ -90,14 +90,14 @@ h2 {
 .product-list {
   display: flex;
   flex-direction: column;
-  gap: 1.4em;
-  margin-bottom: 2.4em;
+  gap: 1.2em;
+  margin-bottom: 2.2em;
 }
 .product-row-outer {
   background: var(--rhinos-white);
   border-radius: 12px;
   border: 1.5px solid #eee;
-  padding: 1.5em 1.1em 1.2em 1.1em;
+  padding: 1.2em 1em 1em 1em;
   margin-bottom: 0.7em;
   box-sizing: border-box;
 }
@@ -120,46 +120,39 @@ h2 {
 }
 .product-row {
   display: flex;
-  gap: 0.8em;
+  gap: 0.7em;
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 0.3em;
 }
-.product-row select, .product-row input[type="number"] {
-  padding: 0.85em 1em;
-  border-radius: 8px;
-  border: 1.6px solid #bbb;
-  font-size: 1.17em;
+
+/* --- Improved sizes for selects, numbers, buttons --- */
+.product-row select,
+.product-row input[type="number"] {
+  padding: 0.5em 0.6em;
+  border-radius: 7px;
+  border: 1.5px solid #bbb;
+  font-size: 1.03em;
   background: #fafafa;
-  min-width: 100px;
+  min-width: 75px;
   transition: border-color 0.2s;
+  height: 2.2em;
+  box-sizing: border-box;
 }
-.product-row select:focus, .product-row input[type="number"]:focus {
-  border-color: var(--rhinos-red);
-  background: #fff;
+
+.add-btn, .remove-btn {
+  font-size: 1em;
+  padding: 0.45em 1.15em;
+  border-radius: 7px;
 }
-.add-btn {
-  background: var(--rhinos-red);
-  color: var(--rhinos-white);
-  border: none;
-  border-radius: 8px;
-  padding: 0.72em 1.3em;
-  font-size: 1.14em;
-  cursor: pointer;
-  font-weight: 500;
-  margin-left: 0.3em;
-  box-shadow: 0 1.5px 0 #b4001999;
-  transition: background 0.2s;
-}
-.add-btn:hover { background: #930016; }
+
 .submit-btn {
-  padding: 1.25em 2em;
-  font-size: 1.19em;
+  font-size: 1.05em;
+  padding: 1em 1em;
+  border-radius: 8px;
   background: var(--rhinos-black);
-  border: none;
-  border-radius: 10px;
   color: var(--rhinos-white);
-  cursor: pointer;
+  border: none;
   width: 100%;
   margin-top: 1.4em;
   font-weight: 600;
@@ -168,6 +161,23 @@ h2 {
   transition: background 0.2s;
 }
 .submit-btn:hover { background: var(--rhinos-red); }
+.add-btn {
+  background: var(--rhinos-red);
+  color: var(--rhinos-white);
+  border: none;
+  box-shadow: 0 1.5px 0 #b4001999;
+  transition: background 0.2s;
+}
+.add-btn:hover { background: #930016; }
+.remove-btn {
+  background: var(--rhinos-black);
+  color: var(--rhinos-white);
+  border: none;
+  transition: background 0.2s;
+  margin-left: 0.2em;
+}
+.remove-btn:hover { background: var(--rhinos-red); }
+
 #result {
   background: #fff9f9;
   color: var(--rhinos-black);
@@ -182,7 +192,7 @@ h2 {
 table {
   border-collapse: collapse;
   width: 100%;
-  margin-bottom: 1.4em;
+  margin-bottom: 1.2em;
   margin-top: 0.7em;
   background: var(--rhinos-white);
   border-radius: 8px;
@@ -190,42 +200,28 @@ table {
 }
 th, td {
   border: 1px solid #e1e1e1;
-  padding: 0.9em 0.6em;
+  padding: 0.8em 0.5em;
   text-align: left;
 }
 th {
   background: #faf9f9;
   color: var(--rhinos-red);
   font-weight: 700;
-  font-size: 1.04em;
+  font-size: 1.02em;
   border-bottom: 2.3px solid var(--rhinos-red);
 }
 td {
-  font-size: 1.05em;
-}
-.remove-btn {
-  background: var(--rhinos-black);
-  color: var(--rhinos-white);
-  border: none;
-  border-radius: 8px;
-  padding: 0.65em 1.2em;
   font-size: 1em;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-left: 0.2em;
-}
-.remove-btn:hover {
-  background: var(--rhinos-red);
 }
 .order-total {
   text-align: right;
   font-weight: 700;
   color: var(--rhinos-red);
-  font-size: 1.17em;
+  font-size: 1.13em;
   margin-top: 0.3em;
 }
 
-/* ---- Mobile: full width, comfy size, no root font zoom ---- */
+/* ---- Mobile: full width, comfy but not too big ---- */
 @media (max-width: 1000px) {
   .header-bar,
   .form-area {
@@ -244,10 +240,20 @@ td {
     padding-right: 6px;
     margin-bottom: 1.1em;
   }
-  .product-row select, .product-row input[type="number"], .add-btn, .submit-btn, .remove-btn {
-    font-size: 1.14em;
-    padding-top: 1.1em;
-    padding-bottom: 1.1em;
+  .product-row select,
+  .product-row input[type="number"] {
+    font-size: 1em;
+    min-width: 75px;
+    padding: 0.5em 0.6em;
+    height: 2.1em;
+  }
+  .add-btn, .remove-btn {
+    font-size: 1em;
+    padding: 0.4em 1em;
+  }
+  .submit-btn {
+    font-size: 1.08em;
+    padding: 1em 1em;
   }
 }
 @media (max-width: 500px) {
@@ -261,11 +267,12 @@ td {
   }
 }
 </style>
+
 </head>
 <body>
   <div class="header-bar">
     <img src="https://borasrhinos.web.sportadmin.se/im/hemsidaLogga/939/22639/_genLogga.png?v=19" class="logo" alt="Borås Rhinos Logo">
-    <h1>Borås Rhinos<br>Klubbkläder</h1>
+    <h1>Borås Rhinos<br>Beställ klubbkläder</h1>
   </div>
     <div class="form-area">
       <form id="orderForm" autocomplete="off">
