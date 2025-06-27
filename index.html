@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Team Clothing Order Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2em; }
+    .section { margin-bottom: 2em; }
+    .add-btn, .remove-btn { margin-left: 0.5em; }
+    .submit-btn { padding: 1em 2em; font-size: 1em; background: #5ba; border: none; border-radius: 5px; color: #fff; cursor: pointer; }
+    .submit-btn:hover { background: #489; }
+    #result { background: #f9f9f9; padding: 1em; border-radius: 5px; margin-top: 2em; }
+    table { border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 0.5em 1em; }
+    th { background: #f0f0f0; }
+    input[type="number"] { width: 60px; }
+    select { min-width: 90px; }
+  </style>
+</head>
+<body>
+  <h1>Team Clothing Order Form</h1>
+  <form id="orderForm" autocomplete="off">
+    <div>
+      <label>Name: <input type="text" name="name" required></label>
+    </div>
+    <div>
+      <label>Email: <input type="email" name="email" required></label>
+    </div>
+    <div class="section">
+      <h2>Order Item</h2>
+      <select id="item-select">
+        <option value="">Select item</option>
+        <option value="Hoodie (zip)">Hoodie (zip)</option>
+        <option value="Shorts">Shorts</option>
+        <option value="Collage Pants">Collage Pants</option>
+      </select>
+      <select id="size-select">
+        <option value="">Select size</option>
+      </select>
+      <button type="button" class="add-btn" onclick="addOrder()">Add</button>
+      <table id="order-table" style="display:none; margin-top:1em;">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="submit" class="submit-btn">Submit Order</button>
+  </form>
+  <div id="result"></div>
+  <script>
+    // Size options for each item
+    const sizeOptions = {
+      "Hoodie (zip)": ["90", "100", "110", "120", "130", "140", "150", "160", "XS", "S", "M", "L", "XL", "XXL", "XXXL"],
+      "Shorts": ["90", "100", "110", "120", "130", "140", "150", "160", "S", "M", "L", "XL", "XXL"],
+      "Collage Pants": ["90", "100", "110", "120", "130", "140", "150", "S", "M", "L", "XL", "XXL"]
+    };
+    let orders = [];
+
+    // Dynamically update sizes based on selected item
+    document.getElementById("item-select").addEventListener("change", function() {
+      const item = this.value;
+      const sizeSelect = document.getElementById("size-select");
+      sizeSelect.innerHTML = '<option value="">Select size</option>';
+      if (item && sizeOptions[item]) {
+        sizeOptions[item].forEach(size => {
+          let opt = document.createElement("option");
+          opt.value = size;
+          opt.textContent = size;
+          sizeSelect.appendChild(opt);
+        });
+      }
+    });
+
+    function addOrder() {
+      const item = document.getElementById("item-select").value;
+      const size = document.getElementById("size-select").value;
+      if (!item || !size) return;
+      // Prevent duplicates
+      if (orders.find(o => o.item === item && o.size === size)) {
+        alert("Already added this item/size.");
+        return;
+      }
+      orders.push({ item, size, quantity: 1 });
+      renderOrderTable();
+    }
+
+    function renderOrderTable() {
+      const table = document.getElementById("order-table");
+      const tbody = table.querySelector("tbody");
+      tbody.innerHTML = "";
+      orders.forEach((o, idx) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${o.item}</td>
+          <td>${o.size}</td>
+          <td><input type="number" min="1" value="${o.quantity}" onchange="updateQty(${idx}, this.value)"></td>
+          <td><button type="button" class="remove-btn" onclick="removeOrder(${idx})">Remove</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      table.style.display = orders.length ? "" : "none";
+    }
+
+    function updateQty(idx, value) {
+      orders[idx].quantity = Math.max(1, parseInt(value) || 1);
+    }
+
+    function removeOrder(idx) {
+      orders.splice(idx, 1);
+      renderOrderTable();
+    }
+
+    window.updateQty = updateQty;
+    window.removeOrder = removeOrder;
+
+    // Handle submit
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = this.name.value;
+      const email = this.email.value;
+      if (!orders.length) {
+        alert("Please add at least one item.");
+        return;
+      }
+      // Send each order line as a row to Google Sheet via Apps Script Web App
+      let sent = 0;
+      let failed = 0;
+      orders.forEach((order, i) => {
+        fetch("https://script.google.com/macros/s/AKfycbzV_Li1OuPfBPgjAaYehzbaWpebXpxdbY6o0dtjwxIcXnp4bXmLw5mi7AUSP9R_Nf74ow/exec", {
+          method: "POST",
+  	mode: "no-cors", // This disables CORS checks, but...
+  	headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            item: order.item,
+            size: order.size,
+            quantity: order.quantity
+          })
+        })
+        .then(resp => resp.text())
+        .then(respText => {
+          sent++;
+          if (sent + failed === orders.length) {
+            document.getElementById("result").innerHTML =
+              `<p><b>Order submitted!</b> Thank you, ${name}.</p>`;
+            orders = [];
+            renderOrderTable();
+            document.getElementById("orderForm").reset();
+          }
+        })
+        .catch(err => {
+          failed++;
+          if (sent + failed === orders.length) {
+            document.getElementById("result").innerHTML =
+              `<p><b>Some lines failed to send.</b> Please try again.</p>`;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
