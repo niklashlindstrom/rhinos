@@ -11,6 +11,7 @@
   --rhinos-white: #fff;
   --rhinos-gray: #f5f5f5;
 }
+
 body {
   font-family: 'Roboto', Arial, sans-serif;
   margin: 0;
@@ -94,8 +95,9 @@ h2 {
   background: var(--rhinos-white);
   border-radius: 10px;
   border: 1.5px solid #eee;
-  padding: 1.2em 1em 1em 1em;
-  margin-bottom: 0.4em;
+  padding: 1.2em 0.8em 1em 0.8em;
+  margin-bottom: 0.7em;
+  box-sizing: border-box;
 }
 .product-header {
   font-size: 1.08em;
@@ -221,7 +223,7 @@ td {
   margin-top: 0.3em;
 }
 
-/* ---- Mobile: remove side margins ---- */
+/* ---- Mobile: remove side margins and tweak cards ---- */
 @media (max-width: 700px) {
   .header-bar,
   .form-area {
@@ -234,14 +236,29 @@ td {
     padding-left: 0;
     padding-right: 0;
   }
+  .form-area {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .product-row-outer {
+    border-radius: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-bottom: 0.9em;
+  }
 }
 @media (max-width: 430px) {
   .form-area {
     padding-left: 0;
     padding-right: 0;
   }
+  .product-row-outer {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
 }
 </style>
+
 
 </head>
 <body>
